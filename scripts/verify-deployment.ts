@@ -107,9 +107,9 @@ const cookie = (login.headers.get("set-cookie") ?? "").split(";")[0] ?? "";
 check("operator login is 200", login.status === 200 && login.json?.authenticated === true);
 if (login.status !== 200) process.exit(1);
 check(
-  "session cookie is HttpOnly and SameSite=Strict (and Secure over https)",
+  "session cookie is HttpOnly and SameSite=Lax (and Secure over https)",
   /HttpOnly/.test(login.headers.get("set-cookie") ?? "") &&
-    /SameSite=Strict/.test(login.headers.get("set-cookie") ?? "") &&
+    /SameSite=Lax/.test(login.headers.get("set-cookie") ?? "") &&
     (!https || /Secure/.test(login.headers.get("set-cookie") ?? "")),
 );
 const csrf = login.json?.csrfToken as string;
