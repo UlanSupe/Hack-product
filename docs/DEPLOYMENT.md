@@ -109,6 +109,10 @@ I have no Render account or API key, the project folder is not a Git repository,
 5. **Making the hosted demo useful to judges.** Without PayPal values the payment step says it cannot start; with the four sandbox values entered the server creates real sandbox orders, but a judge cannot approve one without a sandbox buyer login. Either put the sandbox Personal (buyer) account's login in the submission's testing instructions (sandbox accounts are synthetic) or leave PayPal off and let judges use the Arena, the flagship replay, the Cockpit and the Live model page, which need nothing. Share the `OPERATOR_PASSCODE` from the dashboard in the testing instructions for the operator pages. Keep `AGENT_MODE=scripted`: a shared model key on a public demo would be rate-limited (8000 tokens per minute on Groq's free tier) and spendable by anyone with the passcode.
 6. For the PayPal sandbox (optional, **not verified on Render**): create a sandbox REST app and a webhook listener for `<url>/api/webhooks/paypal`, put the client id, secret, webhook id and the sandbox business account id into the dashboard, redeploy, and run `npm run paypal:smoke` locally first.
 
+### Keep the hosted demo unchanged until the judging period ends
+
+Entries cannot be edited after the submission deadline, and the testing instructions name a URL, an operator passcode and a sandbox buyer login. Do not rotate the passcode, change the sandbox accounts, delete the Render service or delete the PayPal webhook before the judging period ends (2026-12-15). The free plan is allowed to sleep; the first request after a sleep takes about a minute.
+
 ## 11. Verification record
 
 ### Done: a local rehearsal of the same deployment (2026-11-05)
