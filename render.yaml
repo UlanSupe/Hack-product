@@ -12,7 +12,8 @@ services:
     plan: free
     autoDeployTrigger: "off"
     # --include=dev: the build needs TypeScript and the type packages, which are devDependencies.
-    buildCommand: npm ci --include=dev && npm run build
+    # The seeded benchmark results are generated at build time (5 seconds) because that file is git-ignored and the Cockpit needs it.
+    buildCommand: npm ci --include=dev && npm run build && npm run benchmark
     # Validates the environment, creates/migrates the database, adds the synthetic demo data, then runs `next start`.
     startCommand: npm run start:demo
     # 200 only when the service can serve (database migrated, configuration valid); otherwise 503.

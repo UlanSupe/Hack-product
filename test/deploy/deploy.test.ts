@@ -367,7 +367,9 @@ describe("render.yaml (the Blueprint) holds no secret and matches the app", () =
   it("uses commands and a health path that exist", () => {
     expect(yaml).toMatch(/startCommand: npm run start:demo/);
     expect(pkg.scripts["start:demo"]).toBe("node scripts/start.ts");
-    expect(yaml).toMatch(/buildCommand: npm ci --include=dev && npm run build/);
+    expect(yaml).toMatch(
+      /buildCommand: npm ci --include=dev && npm run build && npm run benchmark/,
+    );
     expect(pkg.scripts.build).toBe("next build");
     expect(yaml).toMatch(/healthCheckPath: \/api\/health/);
     expect(existsSync("src/app/api/health/route.ts")).toBe(true);

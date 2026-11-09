@@ -18,12 +18,12 @@ Why Render's Node web service and not a serverless host: the SQLite file and the
 
 ## 2. Commands
 
-| Purpose           | Command                                                | Notes                                                                                       |
-| ----------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| Build             | `npm ci --include=dev && npm run build`                | `--include=dev` because the build needs TypeScript and the type packages (devDependencies). |
-| Start             | `npm run start:demo`                                   | `node scripts/start.ts`: validate, migrate, seed, then `next start -H 0.0.0.0 -p $PORT`.    |
-| Health check path | `/api/health`                                          | 200 when it can serve, otherwise 503 (section 5).                                           |
-| Local development | `npm run dev`, `npm run db:migrate`, `npm run db:seed` | Unchanged. `DEPLOY_MODE` defaults to `local`.                                               |
+| Purpose           | Command                                                      | Notes                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Build             | `npm ci --include=dev && npm run build && npm run benchmark` | `--include=dev` because the build needs TypeScript and the type packages (devDependencies). `npm run benchmark` (5 s) writes the git-ignored seeded benchmark file that the Cockpit's benchmark view reads. |
+| Start             | `npm run start:demo`                                         | `node scripts/start.ts`: validate, migrate, seed, then `next start -H 0.0.0.0 -p $PORT`.                                                                                                                    |
+| Health check path | `/api/health`                                                | 200 when it can serve, otherwise 503 (section 5).                                                                                                                                                           |
+| Local development | `npm run dev`, `npm run db:migrate`, `npm run db:seed`       | Unchanged. `DEPLOY_MODE` defaults to `local`.                                                                                                                                                               |
 
 `DEPLOY_MODE=demo` must be set at **build** time as well as at run time: response headers are fixed when the app is built. `render.yaml` sets it once and Render passes service variables to both.
 
