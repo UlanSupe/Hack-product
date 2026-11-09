@@ -46,6 +46,16 @@ The protected side then carries a real transaction through PayPal Sandbox states
 | `/mandate`      | Operator console: set budget, per-transaction cap, categories, approval threshold. Approving creates an immutable new version.                             | `OPERATOR_PASSCODE` |
 | `/negotiations` | Operator console: state a request, collect seller offers, counter, accept, then run the payment steps.                                                     | `OPERATOR_PASSCODE` |
 
+## How PayPal and AI are used, and the tools
+
+**PayPal (Sandbox only).** OAuth2 client credentials (server side only); **Orders API v2** (an `AUTHORIZE` order created from the server's own agreement, read back from PayPal before it is believed, authorized after the buyer approves at PayPal); **Payments API v2** (capture and void of the authorization); `PayPal-Request-Id` idempotency on every write; **webhooks** verified through PayPal's `verify-webhook-signature` service and used only as a trigger to re-read the order. Verified live in the Sandbox: create, approve, authorize, capture, void and signed webhooks ([docs/PAYPAL_INTEGRATION.md](docs/PAYPAL_INTEGRATION.md) section 17). Not used: Payouts, Braintree, Venmo. There is no escrow and no payout.
+
+**AI.** A real model (**Groq**, `openai/gpt-oss-120b`) plays the buyer and the seller behind the same strict JSON and schema validation as the scripted agents; it can only propose, never approve, authorize, capture or pay. It was measured live against ten hostile-seller scripts ([docs/LIVE_MODEL_ATTACK.md](docs/LIVE_MODEL_ATTACK.md)). An **Anthropic Messages API** provider is implemented behind the same interface but was only tested against mocked HTTP. The default agents are deterministic and scripted so that the demo and the benchmark replay exactly.
+
+**Sponsor tools.** **AG Grid** (Community edition, MIT): the Cockpit's data grid. **Render**: the hosted demo ([render.yaml](render.yaml), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). No other sponsor tool is used.
+
+**Other tools.** Next.js, React, TypeScript, Zod, SQLite (`node:sqlite`), Vitest, Playwright, ESLint. Built with an AI coding assistant (Claude Code); the demo video's narration voice is from ElevenLabs.
+
 ## Quick start
 
 **Requirements:** Node.js **>= 22.18** (the project is tested on 24.18; `.nvmrc` pins 24) and npm. The code uses Node's built-in `node:sqlite` and native TypeScript execution for `scripts/`, so there is no native build step and no database server to install.
