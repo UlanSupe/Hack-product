@@ -85,6 +85,24 @@ npm run dev        # then open http://localhost:3000, /flagship, /arena, /cockpi
 
 **Hosted demo:** https://pactpay-arena.onrender.com (Render free plan: it sleeps after 15 minutes without requests, so the first load can take about a minute, and its data is recreated on every restart). On 2026-11-09 its health endpoint reported demo mode, PayPal Sandbox credentials present and a ready database, and the Start, Flagship, Arena, Cockpit and Live model pages answered 200. The operator pages need the passcode given in the submission's testing instructions. One PayPal Sandbox payment was also run on this host (order, approval, hold, capture) and confirmed at PayPal: order `COMPLETED`, capture `COMPLETED` for 60.00 USD, and PayPal issued the order-approved, authorization-created and capture-completed webhook events for it. The flagship attack (`/flagship`), the Arena, the Cockpit and the Live model page (`/live-model`) need no setup. The operator consoles need one value (`OPERATOR_PASSCODE` in `.env.local`, see `.env.example`), and the PayPal and real-model paths need your own sandbox credentials and key. Full instructions, troubleshooting, the threat model and the benchmark methodology are in `README.md`.
 
+## Testing instructions (for the submission form)
+
+Paste this into the form's testing instructions and fill in the three bracketed values there. They are deliberately not stored in this public repository.
+
+> Hosted demo: https://pactpay-arena.onrender.com (free plan: the first load after a period of no use takes about a minute). Code and full setup instructions: https://github.com/UlanSupe/Hack-product (README, section "Testing it (for judges)").
+> No sign-in is needed for the Flagship attack (/flagship), the Arena (/arena), the Cockpit (/cockpit) and the Live model page (/live-model).
+> To run the protected payment flow (/negotiations): sign in with the operator passcode **[passcode]**. Open a task from the "compute-within-budget" scenario, press "Run the demo agents", accept the offer, then "Start PayPal sandbox payment", open the PayPal approval page and log in with the sandbox buyer **[sandbox buyer email]** / **[sandbox buyer password]** and approve. Back in the app press "Check status with PayPal", then "Place the hold", then "Capture". Everything is PayPal Sandbox test money.
+> The hosted demo uses scripted agents. The real-model scene of the video needs a free Groq key and runs locally (README); the recorded measurement of that model is on /live-model.
+> Please do not change the sandbox accounts. The operator passcode and the buyer login stay valid until the judging period ends.
+
+## Sponsor tools used
+
+AG Grid (Community edition, MIT): the Cockpit's data grid. Render: the hosted demo (Blueprint `render.yaml`). No other sponsor tool is used, and none is claimed.
+
+## Trademarks
+
+PactPay Arena is an independent hackathon project, not affiliated with or endorsed by PayPal, Groq, Anthropic, ElevenLabs or Render. It uses the PayPal Sandbox only.
+
 ## Limitations (stated plainly)
 
 - Verified live in the PayPal Sandbox: create, approve, authorize, capture, void, reconciliation, and signed webhooks for five event types (through a temporary tunnel; no public deployment exists).

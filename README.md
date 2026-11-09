@@ -250,6 +250,14 @@ A Render Blueprint (`render.yaml`) and a hosted start script (`npm run start:dem
 | UI and Cockpit                        | [USER_JOURNEY.md](docs/USER_JOURNEY.md), [UI_DESIGN.md](docs/UI_DESIGN.md), [COCKPIT.md](docs/COCKPIT.md)                                                                                                                                                                                                 |
 | Quality and deployment                | [QA_REPORT.md](docs/QA_REPORT.md), [RELEASE_CANDIDATE.md](docs/RELEASE_CANDIDATE.md), [DEPLOYMENT.md](docs/DEPLOYMENT.md), [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) (demo video plan; the automated pipeline is in [demo/](demo/README.md)), [SUBMISSION.md](docs/SUBMISSION.md) (hackathon submission text) |
 
+## Testing it (for judges)
+
+Pick whichever is quicker; none of them needs a paid service.
+
+1. **Hosted demo:** https://pactpay-arena.onrender.com (Render free plan: the first load after a sleep takes about a minute). The public pages need nothing: [Flagship attack](https://pactpay-arena.onrender.com/flagship), [Arena](https://pactpay-arena.onrender.com/arena), [Cockpit](https://pactpay-arena.onrender.com/cockpit) and [Live model](https://pactpay-arena.onrender.com/live-model). The operator pages (`/mandate`, `/negotiations`, where the PayPal payment is run) need the operator passcode and the sandbox buyer login, which are in the testing instructions of the Devpost submission (they are not in this public repository). The hosted demo uses the scripted agents, so its "Run with the AI model" button is off; the real-model scene needs your own free Groq key (below) and the measurement is on the Live model page.
+2. **Locally, no credentials:** `npm ci`, `npm run db:migrate`, `npm run db:seed`, `npm run dev`, then open http://localhost:3000. Everything except the PayPal payment and the real model works.
+3. **Locally, the full flow:** add your own PayPal Sandbox app (see [PayPal Sandbox configuration](#paypal-sandbox-configuration)) and, for the real model, a free Groq key (`AGENT_MODE=llm`, `AGENT_PROVIDER=groq`, `GROQ_API_KEY`, `AGENT_MODEL=openai/gpt-oss-120b`; see `.env.example`).
+
 ## Known limitations
 
 - Live-verified against PayPal Sandbox: create, approve, authorize, capture, reconciliation. **Also verified live:** void (hold released, nothing charged) and signed webhooks (seven PayPal-delivered events over two runs, verified and stored, through a temporary tunnel; a refund event carries no order id and is stored but not applied). The real model was called live once (Groq); the benchmark's models are still deterministic; see [Status at a glance](#status-at-a-glance-read-this-first).
@@ -266,3 +274,5 @@ This project was built with an AI coding assistant (Claude Code) working under t
 ## License
 
 MIT. See [LICENSE](LICENSE). The production dependencies are MIT, Apache-2.0, ISC, BSD or similar permissive licenses. The lockfile also lists **optional** LGPL-licensed image-library binaries (`@img/sharp-*`, pulled in by Next.js) that npm may download for your platform; this app disables image optimization and does not ship or link them itself. AG Grid is used in its MIT-licensed Community edition only, with no Enterprise feature or licence key.
+
+**Trademarks.** PactPay Arena is an independent hackathon project. It is not affiliated with, endorsed by or sponsored by PayPal, Groq, Anthropic, ElevenLabs or Render; those names and PayPal's marks belong to their owners and are used only to say which services the project talks to. It uses the PayPal Sandbox only.
