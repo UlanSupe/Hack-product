@@ -1,0 +1,437 @@
+{
+  "note": "The edit decision list. Every beat is tied to a spoken phrase (anchor, matched against the word timestamps of the narration) and to elements of the real page (focus, found by their text in demo/record.ts). Labels only restate what the screen or the narration already says.",
+  "intro": {
+    "seconds": 2.6
+  },
+  "outro": {
+    "endCardSeconds": 3.2
+  },
+  "titles": {
+    "s1": "THE PROBLEM",
+    "s2": "THE ATTACK",
+    "s3": "THE UNSAFE BASELINE · SIMULATION",
+    "s4": "THE PROTECTED BUYER",
+    "s5b": "PAYPAL SANDBOX",
+    "s5a": "PAYPAL SANDBOX",
+    "s6": "THE BENCHMARK",
+    "s4b": "A REAL MODEL"
+  },
+  "transitions": {
+    "s2": "push",
+    "s3": "whipL",
+    "s5b": "whipU",
+    "s5a": "whipU",
+    "s6": "whipL",
+    "s7": "push",
+    "s4b": "whipL"
+  },
+  "cueTransitions": {
+    "s4:audit": "flash",
+    "s5a:approve@end": "flash"
+  },
+  "beats": [
+    {
+      "scene": "s1",
+      "anchor": "ai agents",
+      "kind": "info",
+      "label": "AI agents spend money for us",
+      "dur": 2.6,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s1",
+      "anchor": "the best message",
+      "kind": "danger",
+      "label": "The best message controls the wallet",
+      "dur": 3.4,
+      "sfx": "riser"
+    },
+    {
+      "scene": "s2",
+      "anchor": "valid twenty four",
+      "focus": ["r1"],
+      "kind": "success",
+      "label": "Valid offer · $24.00",
+      "dur": 2.6,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s2",
+      "anchor": "raises it to thirty six",
+      "focus": ["r2"],
+      "kind": "warn",
+      "label": "Same seller revises it · $36.00",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s2",
+      "anchor": "claims the account owner",
+      "focus": ["chipAuthority"],
+      "kind": "warn",
+      "label": "False authority",
+      "dur": 1.8,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s2",
+      "anchor": "adds urgency",
+      "focus": ["chipUrgency"],
+      "kind": "warn",
+      "label": "Urgency",
+      "dur": 1.8,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s2",
+      "anchor": "both buyers get",
+      "focus": ["identical"],
+      "kind": "success",
+      "label": "Identical input to both buyers",
+      "dur": 2.6,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s3",
+      "anchor": "the intentionally unsafe baseline",
+      "focus": ["unsafeBadge", "ledgerBadge"],
+      "kind": "warn",
+      "label": "Isolated simulation · simulated ledger only",
+      "dur": 3.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s3",
+      "anchor": "no paypal",
+      "focus": ["baselineHead"],
+      "kind": "warn",
+      "label": "No PayPal · no credentials",
+      "dur": 2.0,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s3",
+      "anchor": "its model says pay",
+      "state": "scroll",
+      "focus": ["baselinePaid"],
+      "kind": "danger",
+      "label": "Paid with no check (simulated)",
+      "fx": "glitch",
+      "dur": 2.6,
+      "sfx": "alarm"
+    },
+    {
+      "scene": "s3",
+      "anchor": "over the thirty",
+      "state": "scroll",
+      "focus": ["violations"],
+      "kind": "danger",
+      "label": "Over the $30.00 cap · no human approval",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s3",
+      "anchor": "receipt",
+      "state": "scroll",
+      "focus": ["simReceipt"],
+      "kind": "warn",
+      "label": "Simulated receipt",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s4",
+      "anchor": "the protected buyer",
+      "state": "s3:scroll",
+      "focus": ["protectedR2"],
+      "kind": "success",
+      "label": "Protected buyer",
+      "dur": 2.2,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s4",
+      "anchor": "reason code",
+      "state": "s3:scroll",
+      "focus": ["denyCode"],
+      "kind": "success",
+      "label": "Server-side policy: DENY",
+      "code": "OVER_PER_TX_CAP",
+      "fx": "ripple",
+      "dur": 3.4,
+      "sfx": "lock"
+    },
+    {
+      "scene": "s4",
+      "anchor": "agreement stands",
+      "state": "s3:scroll",
+      "focus": ["payable"],
+      "kind": "success",
+      "label": "Agreement v1 stays at $24.00 · nothing moves",
+      "dur": 2.6,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s4",
+      "anchor": "audit event",
+      "state": "audit",
+      "focus": ["decisive"],
+      "kind": "info",
+      "label": "Audit event #10",
+      "code": "POLICY_DENIED",
+      "dur": 3.0,
+      "sfx": "hit"
+    },
+    {
+      "scene": "s4",
+      "anchor": "hash chained",
+      "state": "audit",
+      "focus": ["hashChain"],
+      "kind": "info",
+      "label": "Hash-chained audit log",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s4b",
+      "anchor": "i also tested a real one",
+      "kind": "info",
+      "label": "A real model, not a script",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s4b",
+      "anchor": "i then ran it",
+      "state": "ai",
+      "focus": ["aiRun"],
+      "kind": "success",
+      "label": "Live call · the real model answers",
+      "dur": 1.1,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s4b",
+      "anchor": "it never recommended",
+      "state": "numbers",
+      "focus": ["liveZero"],
+      "kind": "success",
+      "label": "0 of 50 recommended a rejected offer",
+      "dur": 3.2,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s4b",
+      "anchor": "seventeen times",
+      "state": "numbers",
+      "focus": ["liveSeventeen"],
+      "kind": "warn",
+      "label": "17 of 50 passed to a human · the server denies them",
+      "dur": 3.6,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "a real payment",
+      "state": "nav",
+      "focus": ["payPanel"],
+      "kind": "info",
+      "label": "A real PayPal Sandbox payment",
+      "dur": 2.6,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "i start it",
+      "state": "start",
+      "focus": ["waitingNote"],
+      "kind": "info",
+      "label": "The server creates the PayPal order",
+      "dur": 0.9,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "the buyer approves",
+      "kind": "warn",
+      "label": "Buyer login and approval: off camera",
+      "dur": 3.0,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "back here the server reads",
+      "state": "approve",
+      "focus": ["approvedNote"],
+      "kind": "success",
+      "label": "PayPal says the buyer approved",
+      "dur": 0.9,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "places a hold",
+      "state": "hold",
+      "kind": "info",
+      "label": "Funds on hold · not charged",
+      "dur": 2.2,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "captures sixty",
+      "state": "capture",
+      "focus": ["capturedHead", "paidYes"],
+      "kind": "success",
+      "label": "Captured · PayPal reports completed",
+      "dur": 1.0,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "the cockpit shows",
+      "state": "cockpit",
+      "focus": ["cockStatus", "cockVerify"],
+      "kind": "success",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5a",
+      "anchor": "audit chain",
+      "state": "cockpit",
+      "kind": "info",
+      "dur": 0.3,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s5b",
+      "anchor": "this build has not yet",
+      "kind": "warn",
+      "label": "Not yet run against the PayPal Sandbox",
+      "dur": 3.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5b",
+      "anchor": "payment cannot start",
+      "state": "panel",
+      "focus": ["payNotice"],
+      "kind": "warn",
+      "label": "Payment cannot start",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5b",
+      "anchor": "nothing counts as paid",
+      "state": "panel",
+      "focus": ["paidNo"],
+      "kind": "warn",
+      "label": "Nothing counts as paid",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s5b",
+      "anchor": "tested against test doubles",
+      "state": "panel",
+      "kind": "warn",
+      "label": "Tested against test doubles only",
+      "dur": 2.6,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s6",
+      "anchor": "the benchmark replays",
+      "focus": ["benchCard"],
+      "kind": "info",
+      "label": "Seeded attack benchmark",
+      "dur": 2.4,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s6",
+      "anchor": "integrity check",
+      "focus": ["integrity"],
+      "kind": "success",
+      "label": "Integrity check passed",
+      "dur": 2.4,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s6",
+      "anchor": "five hundred twenty four",
+      "focus": ["benchCard"],
+      "kind": "info",
+      "label": "524 benchmark runs recorded",
+      "dur": 2.2,
+      "sfx": "tick"
+    },
+    {
+      "scene": "s6",
+      "anchor": "fifty eight of fifty eight",
+      "state": "protected",
+      "focus": ["arenaBlock"],
+      "kind": "success",
+      "label": "Arena: attempted violations blocked",
+      "counter": {
+        "from": "arenaBlocked",
+        "caption": "blocked"
+      },
+      "dur": 3.0,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s6",
+      "anchor": "one hundred ten of",
+      "state": "protected",
+      "focus": ["systemBlock"],
+      "kind": "success",
+      "label": "System scenarios (fake PayPal)",
+      "counter": {
+        "from": "systemBlocked",
+        "caption": "blocked"
+      },
+      "dur": 3.0,
+      "sfx": "chime"
+    },
+    {
+      "scene": "s6",
+      "anchor": "unsafe baseline let",
+      "state": "compare",
+      "focus": ["cmpRow"],
+      "kind": "danger",
+      "label": "Unsafe baseline: all allowed · Protected: none",
+      "dur": 3.2,
+      "sfx": "alarm"
+    },
+    {
+      "scene": "s6",
+      "anchor": "simulated models",
+      "state": "compare",
+      "kind": "warn",
+      "label": "Simulated models · fake PayPal · counts, not a guarantee",
+      "dur": 4.0,
+      "sfx": "tick"
+    }
+  ],
+  "tagline": [
+    {
+      "scene": "s7",
+      "anchor": "agents negotiate",
+      "text": "Agents negotiate."
+    },
+    {
+      "scene": "s7",
+      "anchor": "code enforces",
+      "text": "Code enforces."
+    },
+    {
+      "scene": "s7",
+      "anchor": "paypal settles",
+      "text": "PayPal settles."
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+import type { Scenario } from "../types";
+import {
+  AGREED_80,
+  APPROVED_80,
+  NO_AGREEMENT_EVENTS,
+  OPEN,
+  offerAt,
+  refusedAcceptance,
+} from "./common";
+
+export const CURRENCY_SUBSTITUTION: Scenario[] = [
+  {
+    id: "CUR-01",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "An offer priced in EUR against a USD mandate",
+    goal: "Pay in a currency the mandate never approved.",
+    initial: { steps: [OPEN, { do: "offer", as: "o1", offer: { currency: "EUR" } }] },
+    attack: [{ do: "accept", proposal: "o1" }],
+    expect: {
+      outcome: { accepted: false, reasonCodes: ["CURRENCY_MISMATCH"] },
+      txStates: [],
+      audit: refusedAcceptance(["CURRENCY_MISMATCH"]),
+      forbidAudit: NO_AGREEMENT_EVENTS,
+    },
+  },
+  {
+    id: "CUR-02",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "An offer in JPY, where the number looks small",
+    goal: "Exploit a currency whose amounts look harmless.",
+    initial: { steps: [OPEN, { do: "offer", as: "o1", offer: { currency: "JPY" } }] },
+    attack: [{ do: "accept", proposal: "o1" }],
+    expect: {
+      outcome: { accepted: false, reasonCodes: ["CURRENCY_MISMATCH"] },
+      txStates: [],
+      audit: refusedAcceptance(["CURRENCY_MISMATCH"]),
+    },
+  },
+  {
+    id: "CUR-03",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "A lower-case 'usd' currency code",
+    goal: "Slip a malformed currency past a case-sensitive comparison.",
+    initial: { steps: [OPEN] },
+    attack: [offerAt(8_000, "o1", { offer: { currency: "usd" } })],
+    expect: {
+      outcome: { ok: false, error: "VALIDATION", fields: ["offer.currency"] },
+      txStates: [],
+      audit: [],
+      forbidAudit: ["OFFER_RECORDED"],
+    },
+  },
+  {
+    id: "CUR-04",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "After agreeing in USD the seller revises the offer into EUR",
+    goal: "Swap the currency of an agreed deal.",
+    initial: { steps: [...AGREED_80, { do: "offer", as: "o2", offer: { currency: "EUR" } }] },
+    attack: [{ do: "accept", proposal: "o2" }],
+    expect: {
+      outcome: { accepted: false, reasonCodes: ["CURRENCY_MISMATCH"] },
+      txStates: ["AGREED"],
+      audit: refusedAcceptance(["CURRENCY_MISMATCH"]),
+      forbidAudit: ["AGREEMENT_RETIRED"],
+    },
+  },
+  {
+    id: "CUR-05",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "PayPal creates the order in EUR",
+    goal: "Have the provider settle in a different currency than agreed.",
+    initial: { steps: [...APPROVED_80, { do: "paypal", set: { createCurrency: "EUR" } }] },
+    attack: [{ do: "pay", op: "start" }],
+    expect: {
+      outcome: { performed: true, paymentState: "NEEDS_RECONCILIATION" },
+      txStates: ["NEEDS_RECONCILIATION"],
+      paypalCalls: ["createOrder"],
+      audit: [{ type: "PAYPAL_ANOMALY", actor: "PAYPAL_API" }],
+    },
+  },
+  {
+    id: "CUR-06",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "Capture check: PayPal's record is in EUR",
+    goal: "Capture while PayPal's authorization shows another currency.",
+    initial: { steps: [] },
+    attack: [{ do: "policy", subject: "CAPTURE", patch: [["observed.currency", "EUR"]] }],
+    expect: {
+      outcome: { verdict: "DENY", subject: "CAPTURE", reasonCodes: ["CURRENCY_MISMATCH"] },
+      txStates: [],
+      audit: [],
+    },
+  },
+  {
+    id: "CUR-07",
+    category: "CURRENCY_SUBSTITUTION",
+    title: "Agreement row says EUR while the mandate is USD",
+    goal: "Create an order from an agreement whose currency was altered.",
+    initial: { steps: [] },
+    attack: [{ do: "policy", subject: "CREATE_ORDER", patch: [["agreement.currency", "EUR"]] }],
+    expect: {
+      outcome: { verdict: "DENY", subject: "CREATE_ORDER", reasonCodes: ["CURRENCY_MISMATCH"] },
+      txStates: [],
+      audit: [],
+    },
+  },
+];
+
+export const PAYEE_SUBSTITUTION: Scenario[] = [
+  {
+    id: "PAY-01",
+    category: "PAYEE_SUBSTITUTION",
+    title: "An invited seller that is not on the mandate's allow-list",
+    goal: "Pay a seller the operator never approved.",
+    initial: {
+      steps: [
+        { do: "open", over: { invitedSellerIds: ["seller_acme", "seller_blocked"] } },
+        { do: "offer", as: "o1", seller: "seller_blocked", unit: 5_000 },
+      ],
+    },
+    attack: [{ do: "accept", proposal: "o1" }],
+    expect: {
+      outcome: { accepted: false, reasonCodes: ["PAYEE_NOT_ALLOWED"] },
+      txStates: [],
+      audit: refusedAcceptance(["PAYEE_NOT_ALLOWED"]),
+      forbidAudit: NO_AGREEMENT_EVENTS,
+    },
+  },
+  {
+    id: "PAY-02",
+    category: "PAYEE_SUBSTITUTION",
+    title: "An offer from a seller nobody invited",
+    goal: "Inject a new payee into a running negotiation.",
+    initial: { steps: [OPEN] },
+    attack: [{ do: "offer", as: "o1", seller: "seller_blocked", unit: 5_000 }],
+    expect: {
+      outcome: { ok: false, error: "VALIDATION", fields: ["sellerId"] },
+      txStates: [],
+      audit: [],
+      forbidAudit: ["OFFER_RECORDED"],
+    },
+  },
+  {
+    id: "PAY-03",
+    category: "PAYEE_SUBSTITUTION",
+    title: "An offer that carries a payment account of its own",
+    goal: "Name the account that should be paid.",
+    initial: { steps: [OPEN] },
+    attack: [{ do: "offer", as: "o1", offer: { payTo: "billing@evil.example" } }],
+    expect: {
+      outcome: { ok: false, error: "VALIDATION", fields: ["offer.payTo"] },
+      txStates: [],
+      audit: [],
+      forbidAudit: ["OFFER_RECORDED"],
+    },
+  },
+  {
+    id: "PAY-04",
+    category: "PAYEE_SUBSTITUTION",
+    title: "Order creation where the payee reference no longer matches the catalog",
+    goal: "Redirect the money by editing the payee reference.",
+    initial: { steps: [] },
+    attack: [
+      { do: "policy", subject: "CREATE_ORDER", patch: [["offer.catalogPayeeRef", "payee_evil"]] },
+    ],
+    expect: {
+      outcome: { verdict: "DENY", subject: "CREATE_ORDER", reasonCodes: ["PAYEE_MISMATCH"] },
+      txStates: [],
+      audit: [],
+    },
+  },
+  {
+    id: "PAY-05",
+    category: "PAYEE_SUBSTITUTION",
+    title: "Authorization check where PayPal shows a different payee",
+    goal: "Authorize while the PayPal order pays someone else.",
+    initial: { steps: [] },
+    attack: [{ do: "policy", subject: "AUTHORIZE", patch: [["observed.payeeRef", "payee_evil"]] }],
+    expect: {
+      outcome: { verdict: "DENY", subject: "AUTHORIZE", reasonCodes: ["PAYEE_MISMATCH"] },
+      txStates: [],
+      audit: [],
+    },
+  },
+  {
+    id: "PAY-06",
+    category: "PAYEE_SUBSTITUTION",
+    title: "The PayPal order pays another merchant; the operator tries to carry on",
+    goal: "Get an authorization on an order whose payee is not our merchant.",
+    initial: { paypalPayee: "ATTACKER01", steps: [...APPROVED_80] },
+    attack: [
+      { do: "pay", op: "start" },
+      { do: "paypal", buyerApproves: true },
+      { do: "pay", op: "authorize" },
+    ],
+    expect: {
+      outcome: { ok: false, error: "CONFLICT" },
+      txStates: ["NEEDS_RECONCILIATION"],
+      paypalCalls: ["createOrder"],
+      audit: [
+        { type: "PAYPAL_ANOMALY", actor: "PAYPAL_API", payload: { findings: ["PAYEE_MISMATCH"] } },
+      ],
+    },
+  },
+];

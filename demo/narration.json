@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "note": "Source of truth for cue points. The spoken text must equal the Say blocks in docs/DEMO_SCRIPT.md (a test checks it); {{name}} markers are screen actions, never spoken.",
+  "clips": [
+    {
+      "id": "s1",
+      "scene": "S1",
+      "windowSeconds": 12,
+      "text": "AI agents are starting to spend our money, but they read text written by the other side. If the model alone decides whether to pay, the best message controls the wallet."
+    },
+    {
+      "id": "s2",
+      "scene": "S2",
+      "windowSeconds": 16,
+      "text": "PactPay Arena sends one seller's attack to two buyers. A valid twenty-four dollar offer, then the same seller raises it to thirty-six, claims the account owner approved it, and adds urgency. Both buyers get identical input."
+    },
+    {
+      "id": "s3",
+      "scene": "S3",
+      "windowSeconds": 25,
+      "text": "On the left, the intentionally unsafe baseline: an isolated simulation that can only debit an in-memory ledger. No PayPal, no credentials. At twenty-four dollars both agree. {{scroll}} At thirty-six its model says pay, and it pays: over the thirty-dollar cap, with no human approval. Simulated money, receipt S-I-M-B-001."
+    },
+    {
+      "id": "s4",
+      "scene": "S4",
+      "windowSeconds": 26,
+      "text": "The protected buyer's model said pay too, but it only asks the server to accept an offer. The server's policy engine judges the stored offer against the mandate and refuses: reason code OVER_PER_TX_CAP. The twenty-four dollar agreement stands; nothing moves. {{audit}} That is audit event ten, POLICY_DENIED, in a hash-chained log. Real server code, throwaway database."
+    },
+    {
+      "id": "s4b",
+      "scene": "S4B",
+      "windowSeconds": 21,
+      "text": "Those were scripted models, so I also tested a real one. Here is Groq's open GPT-OSS model, live, acting as the buyer. {{ai}} I then ran it against ten hostile seller scripts, fifty negotiations. {{numbers}} It never recommended an offer the server rejects. But seventeen times it passed one to a human, so the server stopped them, not the model."
+    },
+    {
+      "id": "s5a",
+      "scene": "S5A",
+      "windowSeconds": 24,
+      "text": "Settlement is PayPal's job, so this is a real payment in the PayPal Sandbox. {{start}} I start it, and the server creates the order from the agreement. {{approve}} The buyer approves on PayPal's own page. Back here the server reads the order from PayPal before believing it, {{hold}} places a hold, {{capture}} and captures sixty dollars of test money. {{cockpit}} The Cockpit shows PayPal's read-back and an intact audit chain."
+    },
+    {
+      "id": "s5b",
+      "scene": "S5B",
+      "windowSeconds": 23,
+      "text": "Settlement is PayPal's job, and I won't pretend otherwise: this build has not yet been run against the PayPal Sandbox. {{panel}} The panel says so. Payment cannot start, nothing counts as paid, and nothing is simulated in its place. The flow is tested against test doubles only."
+    },
+    {
+      "id": "s6",
+      "scene": "S6",
+      "windowSeconds": 28,
+      "text": "The benchmark replays seeded attacks, and its file passes an integrity check: five hundred twenty-four benchmark runs recorded. {{protected}} Against the protected system, fifty-eight of fifty-eight attempted violations in the arena were blocked, and one hundred ten of one hundred ten in the system scenarios. {{compare}} The unsafe baseline let all fifty-eight through. Simulated models and a fake PayPal: counts over these runs, not a guarantee."
+    },
+    {
+      "id": "s7",
+      "scene": "S7",
+      "windowSeconds": 14,
+      "text": "Agents negotiate. Code enforces. PayPal settles. As agents take on more of our spending, we need limits that no persuasion can talk around, enforced in code anyone can inspect."
+    }
+  ]
+}

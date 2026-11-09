@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PactPay Arena demo stage</title>
+    <style>
+      :root {
+        --info: #7cb7ff;
+        --success: #4ade80;
+        --warn: #fbbf24;
+        --danger: #ff5d73;
+        --ink: #eaf1ff;
+        --mute: #9fb0cf;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #060913;
+      }
+      body {
+        font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+        color: var(--ink);
+      }
+      #stage {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #070b16;
+      }
+      #bg,
+      #parts,
+      #grain,
+      #vig,
+      #hud,
+      #intro,
+      #endcard,
+      #flash,
+      #streak {
+        position: absolute;
+        inset: 0;
+      }
+      #bg {
+        background: #070b16;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.55;
+      }
+      #grid {
+        position: absolute;
+        inset: -80px;
+        background-image:
+          linear-gradient(rgba(124, 183, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(124, 183, 255, 0.06) 1px, transparent 1px);
+        background-size: 72px 72px;
+      }
+      #parts {
+        pointer-events: none;
+      }
+      #grain {
+        opacity: 0.07;
+        mix-blend-mode: overlay;
+        image-rendering: pixelated;
+        width: 1920px;
+        height: 1080px;
+      }
+      #topfade {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 96px;
+        background: linear-gradient(rgba(5, 8, 18, 0.9), rgba(5, 8, 18, 0));
+        pointer-events: none;
+      }
+      #vig {
+        background: radial-gradient(
+          ellipse at center,
+          rgba(0, 0, 0, 0) 52%,
+          rgba(0, 0, 0, 0.62) 100%
+        );
+        pointer-events: none;
+      }
+
+      #tr {
+        position: absolute;
+        inset: 0;
+        transform-origin: 50% 50%;
+        will-change: transform, filter, opacity;
+      }
+      #cam {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1280px;
+        height: 720px;
+        transform-origin: 0 0;
+        will-change: transform;
+      }
+      #frame {
+        position: absolute;
+        left: 0;
+        top: -28px;
+        width: 1280px;
+        height: 748px;
+        border-radius: 14px;
+        background: #0e1424;
+        box-shadow:
+          0 40px 120px rgba(0, 0, 0, 0.65),
+          0 0 0 1px rgba(150, 180, 255, 0.16),
+          0 0 80px rgba(70, 110, 255, 0.12);
+      }
+      #chrome {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        padding-left: 14px;
+        gap: 7px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      #route {
+        margin-left: 18px;
+        padding: 3px 16px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.07);
+        font-size: 12.5px;
+        color: var(--mute);
+        font-family: "Cascadia Mono", Consolas, monospace;
+        letter-spacing: 0.2px;
+      }
+      #screen {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1280px;
+        height: 720px;
+        overflow: hidden;
+        border-radius: 0 0 14px 14px;
+        background: #0a0e15;
+      }
+      #shot {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1280px;
+        height: 720px;
+      }
+      #hl {
+        position: absolute;
+        border-radius: 12px;
+        opacity: 0;
+        border: 3px solid var(--c, #7cb7ff);
+      }
+
+      #hud {
+        pointer-events: none;
+      }
+      #pill {
+        position: absolute;
+        left: 50%;
+        bottom: 150px;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 34px 18px 26px;
+        border-radius: 999px;
+        background: rgba(8, 12, 24, 0.84);
+        border: 2px solid var(--c, #7cb7ff);
+        backdrop-filter: blur(10px);
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+        opacity: 0;
+        box-shadow:
+          0 18px 50px rgba(0, 0, 0, 0.5),
+          0 0 40px color-mix(in srgb, var(--c, #7cb7ff) 40%, transparent);
+      }
+      #pill i {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--c, #7cb7ff);
+        box-shadow: 0 0 16px var(--c, #7cb7ff);
+        display: block;
+      }
+      #code {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 262px;
+        text-align: center;
+        font-family: "Cascadia Mono", Consolas, monospace;
+        font-weight: 800;
+        font-size: 88px;
+        letter-spacing: 3px;
+        color: var(--c, #4ade80);
+        opacity: 0;
+        text-shadow:
+          0 0 36px color-mix(in srgb, var(--c, #4ade80) 70%, transparent),
+          0 4px 0 rgba(0, 0, 0, 0.6);
+      }
+      #code .bar {
+        display: block;
+        height: 5px;
+        margin: 12px auto 0;
+        background: var(--c, #4ade80);
+        border-radius: 3px;
+        box-shadow: 0 0 18px var(--c, #4ade80);
+      }
+      #counter {
+        position: absolute;
+        right: 170px;
+        top: 150px;
+        text-align: right;
+        opacity: 0;
+      }
+      #counter b {
+        display: block;
+        font-size: 168px;
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: -2px;
+        color: var(--c, #4ade80);
+        text-shadow:
+          0 0 44px color-mix(in srgb, var(--c, #4ade80) 60%, transparent),
+          0 6px 0 rgba(0, 0, 0, 0.55);
+        font-variant-numeric: tabular-nums;
+      }
+      #counter span {
+        display: block;
+        margin-top: 4px;
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--ink);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      .ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 5px solid var(--c, #4ade80);
+        opacity: 0;
+      }
+      #title {
+        position: absolute;
+        left: 170px;
+        bottom: 62px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        opacity: 0;
+      }
+      #title .n {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0a0e15;
+        background: var(--info);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-family: "Cascadia Mono", Consolas, monospace;
+      }
+      #title .t {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: 5px;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+      }
+      #title .ln {
+        position: absolute;
+        left: 0;
+        bottom: -10px;
+        height: 3px;
+        background: var(--info);
+        box-shadow: 0 0 14px var(--info);
+      }
+      #chapters {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 14px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      #chapters span {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        padding: 5px 14px;
+        border-radius: 999px;
+        color: var(--mute);
+        border: 1px solid rgba(150, 180, 255, 0.18);
+        background: rgba(8, 12, 24, 0.55);
+      }
+      #chapters span.on {
+        color: #0a0e15;
+        background: var(--info);
+        border-color: var(--info);
+        box-shadow: 0 0 18px rgba(124, 183, 255, 0.55);
+      }
+      #wordmark {
+        position: absolute;
+        left: 34px;
+        top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        font-size: 20px;
+        opacity: 0.92;
+      }
+      #wordmark svg {
+        width: 30px;
+        height: 30px;
+      }
+      #badge {
+        position: absolute;
+        right: 34px;
+        top: 16px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--mute);
+      }
+      #kin {
+        position: absolute;
+        inset: 0;
+      }
+      .kw {
+        position: absolute;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 132px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        opacity: 0;
+        line-height: 1;
+      }
+      #flash {
+        background: #fff;
+        opacity: 0;
+      }
+      #streak {
+        background: linear-gradient(
+          100deg,
+          transparent 0%,
+          rgba(160, 200, 255, 0) 38%,
+          rgba(190, 220, 255, 0.55) 50%,
+          rgba(160, 200, 255, 0) 62%,
+          transparent 100%
+        );
+        width: 1100px;
+        left: -1100px;
+        opacity: 0;
+        mix-blend-mode: screen;
+        transform: skewX(-18deg);
+      }
+
+      #intro,
+      #endcard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+      }
+      #intro svg,
+      #endcard svg {
+        width: 250px;
+        height: 250px;
+        filter: drop-shadow(0 0 40px rgba(124, 183, 255, 0.55));
+      }
+      #introTitle,
+      #endTitle {
+        margin-top: 30px;
+        font-size: 118px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        display: flex;
+        gap: 0;
+      }
+      #introTitle span,
+      #endTitle span {
+        display: inline-block;
+      }
+      #introSub,
+      #endSub {
+        margin-top: 16px;
+        font-size: 34px;
+        font-weight: 600;
+        letter-spacing: 6px;
+        color: var(--mute);
+        text-transform: uppercase;
+      }
+      #endTag {
+        margin-top: 44px;
+        font-size: 52px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        background: linear-gradient(90deg, #7cb7ff, #4ade80);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="bg">
+        <div class="blob" id="b1" style="width: 900px; height: 900px; background: #3b5bff"></div>
+        <div class="blob" id="b2" style="width: 800px; height: 800px; background: #7a3cff"></div>
+        <div
+          class="blob"
+          id="b3"
+          style="width: 700px; height: 700px; background: #00c2a8; opacity: 0.32"
+        ></div>
+        <div id="grid"></div>
+      </div>
+      <canvas id="parts" width="1920" height="1080"></canvas>
+
+      <div id="tr">
+        <div id="cam">
+          <div id="frame">
+            <div id="chrome">
+              <i class="dot" style="background: #ff5f57"></i
+              ><i class="dot" style="background: #febc2e"></i
+              ><i class="dot" style="background: #28c840"></i><span id="route">pactpay-arena</span>
+            </div>
+          </div>
+          <div id="screen">
+            <canvas id="shot" width="2560" height="1440"></canvas>
+            <div id="hl"></div>
+          </div>
+        </div>
+      </div>
+
+      <canvas id="grain" width="480" height="270"></canvas>
+      <div id="vig"></div>
+      <div id="topfade"></div>
+
+      <div id="hud">
+        <div id="chapters"></div>
+        <div id="wordmark">
+          <svg viewBox="0 0 32 32">
+            <path
+              d="M16 5l9 3.4v7.2c0 5.4-3.7 9.1-9 11.4-5.3-2.3-9-6-9-11.4V8.4z"
+              fill="none"
+              stroke="#7cb7ff"
+              stroke-width="2.2"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M11.5 16.2l3.2 3.2 6-6.4"
+              fill="none"
+              stroke="#4ade80"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            /></svg
+          >PactPay Arena
+        </div>
+        <div id="badge">PAYPAL SANDBOX ONLY · SYNTHETIC DATA</div>
+        <div id="counter"><b id="cnum">0</b><span id="ccap"></span></div>
+        <div class="ring" id="ring1"></div>
+        <div class="ring" id="ring2"></div>
+        <div id="code"><span id="ctext"></span><i class="bar" id="cbar"></i></div>
+        <div id="pill"><i></i><span id="ptext"></span></div>
+        <div id="title">
+          <span class="n" id="tn">01</span><span class="t" id="tt"></span><i class="ln" id="tl"></i>
+        </div>
+        <div id="kin"></div>
+      </div>
+
+      <div id="streak"></div>
+      <div id="flash"></div>
+      <div id="intro">
+        <svg viewBox="0 0 32 32">
+          <path
+            id="ip1"
+            pathLength="1"
+            d="M16 5l9 3.4v7.2c0 5.4-3.7 9.1-9 11.4-5.3-2.3-9-6-9-11.4V8.4z"
+            fill="none"
+            stroke="#7cb7ff"
+            stroke-width="1.3"
+            stroke-linejoin="round"
+          />
+          <path
+            id="ip2"
+            pathLength="1"
+            d="M11.5 16.2l3.2 3.2 6-6.4"
+            fill="none"
+            stroke="#4ade80"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <div id="introTitle"></div>
+        <div id="introSub">Safe AI-agent commerce</div>
+      </div>
+      <div id="endcard">
+        <svg viewBox="0 0 32 32">
+          <path
+            d="M16 5l9 3.4v7.2c0 5.4-3.7 9.1-9 11.4-5.3-2.3-9-6-9-11.4V8.4z"
+            fill="none"
+            stroke="#7cb7ff"
+            stroke-width="1.3"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M11.5 16.2l3.2 3.2 6-6.4"
+            fill="none"
+            stroke="#4ade80"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <div id="endTitle"></div>
+        <div id="endTag">Agents negotiate. Code enforces. PayPal settles.</div>
+        <div id="endSub">MIT licensed · PayPal Sandbox only · synthetic data</div>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      const W = 1920,
+        H = 1080;
+      const $ = (id) => document.getElementById(id);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const lerp = (a, b, u) => a + (b - a) * u;
+      const eo = (x) => 1 - Math.pow(1 - clamp(x, 0, 1), 3);
+      const ei = (x) => Math.pow(clamp(x, 0, 1), 3);
+      const eio = (x) => {
+        x = clamp(x, 0, 1);
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      };
+      const COLORS = { info: "#7cb7ff", success: "#4ade80", warn: "#fbbf24", danger: "#ff5d73" };
+      const ROUTES = {
+        s1: "/flagship",
+        s2: "/flagship",
+        s3: "/flagship",
+        s4: "/flagship",
+        s5a: "/negotiations",
+        s5b: "/negotiations",
+        s6: "/cockpit",
+        s7: "/",
+      };
+      const CHAPTERS = [
+        ["s1", "PROBLEM"],
+        ["s2", "ATTACK"],
+        ["s3", "BASELINE"],
+        ["s4", "PROTECTED"],
+        ["s5b", "PAYPAL"],
+        ["s6", "BENCHMARK"],
+      ];
+
+      let TL, FRAMES, STILLS, S, WIDE;
+      const shot = $("shot"),
+        sctx = shot.getContext("2d");
+      let curKey = "";
+      let seed = 1;
+      const rnd = () => {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return seed / 4294967296;
+      };
+
+      // ---- static decoration ---------------------------------------------------------------------------------------------------
+      const gctx = $("grain").getContext("2d");
+      (function makeGrain() {
+        const im = gctx.createImageData(480, 270);
+        for (let i = 0; i < im.data.length; i += 4) {
+          const v = Math.floor(rnd() * 255);
+          im.data[i] = im.data[i + 1] = im.data[i + 2] = v;
+          im.data[i + 3] = 255;
+        }
+        gctx.putImageData(im, 0, 0);
+      })();
+      const PARTS = Array.from({ length: 46 }, () => ({
+        x: rnd() * W,
+        y: rnd() * H,
+        r: 2 + rnd() * 5,
+        vx: 6 + rnd() * 16,
+        vy: -4 - rnd() * 12,
+        ph: rnd() * 6.28,
+        hue: rnd() < 0.5 ? 215 : 160,
+      }));
+      const pctx = $("parts").getContext("2d");
+
+      function init(timeline, frames, stills) {
+        TL = timeline;
+        FRAMES = frames;
+        STILLS = stills;
+        S = TL.geometry.S;
+        WIDE = TL.geometry.WIDE;
+        const ch = $("chapters");
+        ch.innerHTML = CHAPTERS.map(([id, label]) => `<span data-id="${id}">${label}</span>`).join(
+          "",
+        );
+        const mk = (el, text) => {
+          el.innerHTML = [...text].map((c) => `<span>${c === " " ? "&nbsp;" : c}</span>`).join("");
+        };
+        mk($("introTitle"), "PactPay Arena");
+        mk($("endTitle"), "PactPay Arena");
+        const k = $("kin");
+        k.innerHTML = TL.tagline
+          .map(
+            (g, i) => `<div class="kw" id="kw${i}" style="top:${300 + i * 170}px">${g.text}</div>`,
+          )
+          .join("");
+        return true;
+      }
+
+      // ---- footage source -------------------------------------------------------------------------------------------------
+      async function pickSource(t) {
+        let still = null;
+        for (const s of STILLS)
+          if (s.from <= t && t < s.until && (!still || s.from > still.from)) still = s;
+        let key, url;
+        if (still) {
+          key = "still:" + still.url;
+          url = still.url;
+        } else {
+          let lo = 0,
+            hi = FRAMES.length - 1,
+            idx = 0;
+          while (lo <= hi) {
+            const m = (lo + hi) >> 1;
+            if (FRAMES[m].t <= t) {
+              idx = m;
+              lo = m + 1;
+            } else hi = m - 1;
+          }
+          key = "frame:" + idx;
+          url = FRAMES[idx].url;
+        }
+        if (key === curKey) return;
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+        sctx.drawImage(img, 0, 0, 2560, 1440);
+        curKey = key;
+      }
+
+      // ---- camera ------------------------------------------------------------------------------------------------------------
+      function lerpCam(a, b, u) {
+        return { cx: lerp(a.cx, b.cx, u), cy: lerp(a.cy, b.cy, u), z: lerp(a.z, b.z, u) };
+      }
+      function camAt(t) {
+        let seg = null;
+        for (const s of TL.segs) if (s.t0 <= t) seg = s;
+        if (!seg) return WIDE;
+        if (t < seg.t1) return lerpCam(seg.from, seg.to, eio((t - seg.t0) / (seg.t1 - seg.t0)));
+        if (t <= seg.t2) return seg.to;
+        if (t < seg.t3) return lerpCam(seg.to, WIDE, eio((t - seg.t2) / (seg.t3 - seg.t2)));
+        return WIDE;
+      }
+      const sceneAt = (t) => {
+        let s = TL.scenes[0];
+        for (const x of TL.scenes) if (x.startT <= t) s = x;
+        return s;
+      };
+
+      function toScreen(cam, ux, uy) {
+        const s = S * cam.z;
+        return [W / 2 + (ux - cam.cx) * s, H / 2 + (uy - cam.cy) * s];
+      }
+
+      // ---- the frame ---------------------------------------------------------------------------------------------------------
+      async function renderFrame(t) {
+        seed = 12345 + Math.floor(t * 30);
+        await pickSource(t);
+        const sc = sceneAt(t);
+        const endT = TL.endFootage;
+
+        // camera with a slow push while the shot is wide
+        let cam = camAt(t);
+        const wide = clamp(1 - (cam.z - 1) / 0.05, 0, 1);
+        const prog = clamp((t - sc.startT) / Math.max(1, sc.endT - sc.startT), 0, 1);
+        cam = { cx: cam.cx, cy: cam.cy, z: cam.z * (1 + 0.035 * prog * wide) };
+        // the ending: slowly pull back while the tagline plays
+        const tag0 = TL.tagline.length ? TL.tagline[0].t : 1e9;
+        const dimK = eio((t - (tag0 - 0.25)) / 0.9);
+        const s = S * cam.z;
+        $("cam").style.transform =
+          `translate(${W / 2 - cam.cx * s}px, ${H / 2 - cam.cy * s}px) scale(${s})`;
+        $("route").textContent = "pactpay-arena " + (ROUTES[sc.id] || "");
+
+        // ---- transitions ----
+        let tx = 0,
+          ty = 0,
+          tsc = 1,
+          blur = 0,
+          op = 1,
+          flash = 0,
+          streakU = -1,
+          streakA = 0;
+        for (const tr of TL.transitions) {
+          const u = (t - tr.t) / tr.dur + 0.5;
+          if (u < 0 || u > 1) continue;
+          if (tr.type === "flash") {
+            const d = Math.abs(t - tr.t) / (tr.dur / 2);
+            flash = Math.max(flash, 0.85 * (1 - eio(d)));
+            tsc *= 1 + 0.05 * (1 - eio(d));
+            continue;
+          }
+          const half = u < 0.5;
+          const p = half ? ei(u * 2) : 1 - eo((u - 0.5) * 2);
+          blur = Math.max(blur, p * 19);
+          if (tr.type === "whipL") tx += (half ? -1 : 1) * p * 640;
+          if (tr.type === "whipU") ty += (half ? -1 : 1) * p * 420;
+          if (tr.type === "push") {
+            tsc *= half ? 1 + p * 0.28 : 1 - p * 0.14;
+            op *= 1 - 0.4 * p;
+          }
+          streakU = u;
+          streakA = Math.sin(Math.PI * u);
+        }
+        // entrance of the footage after the intro
+        const eu = clamp((t - (TL.intro - 0.55)) / 1.0, 0, 1);
+        if (eu < 1) {
+          const e = eo(eu);
+          tsc *= lerp(0.84, 1, e);
+          ty += (1 - e) * 110;
+          blur = Math.max(blur, (1 - e) * 16);
+          op *= e;
+        }
+        // ending: dim and soften the footage under the tagline, then hand over to the end card
+        op *= 1 - 0.8 * dimK;
+        blur = Math.max(blur, 12 * dimK);
+        const endU = clamp((t - TL.endCard.t) / 0.6, 0, 1);
+        op *= 1 - eo(endU);
+        const tr = $("tr");
+        tr.style.transform = `translate(${tx}px, ${ty}px) scale(${tsc})`;
+        tr.style.filter = blur > 0.3 ? `blur(${blur.toFixed(1)}px)` : "none";
+        tr.style.opacity = op;
+        $("flash").style.opacity = flash;
+        const st = $("streak");
+        st.style.opacity = streakU >= 0 ? 0.6 * streakA : 0;
+        st.style.left = `${lerp(-1200, 2100, clamp(streakU, 0, 1))}px`;
+
+        // ---- beats: highlight, label, code, counter, effects ----
+        let hlBeat = null,
+          pillBeat = null,
+          codeBeat = null,
+          cntBeat = null,
+          glitch = 0,
+          ripple = null;
+        for (const b of TL.beats) {
+          const a = t - (b.t - 0.08),
+            z = t - (b.t + b.dur);
+          if (a < 0 || z > 0.35) continue;
+          if (b.rect) hlBeat = b;
+          if (b.label) pillBeat = b;
+          if (b.code) codeBeat = b;
+          if (b.counter) cntBeat = b;
+          if (b.fx === "glitch" && t >= b.t - 0.05 && t < b.t + 0.6)
+            glitch = 1 - (t - b.t + 0.05) / 0.65;
+          if (b.fx === "ripple" && t >= b.t && t < b.t + 1.3) ripple = b;
+        }
+        const env = (b, inD = 0.28, outD = 0.32) =>
+          clamp((t - (b.t - 0.08)) / inD, 0, 1) * (1 - clamp((t - (b.t + b.dur)) / outD, 0, 1));
+        const hl = $("hl");
+        if (hlBeat) {
+          const e = eo(env(hlBeat)),
+            r = hlBeat.rect,
+            pad = 9,
+            c = COLORS[hlBeat.kind];
+          hl.style.setProperty("--c", c);
+          hl.style.left = `${r.x - pad}px`;
+          hl.style.top = `${r.y - pad}px`;
+          hl.style.width = `${r.w + pad * 2}px`;
+          hl.style.height = `${r.h + pad * 2}px`;
+          const pulse = 0.5 + 0.5 * Math.sin(t * 6);
+          hl.style.opacity = e;
+          hl.style.transform = `scale(${lerp(1.05, 1, e)})`;
+          hl.style.boxShadow = `0 0 0 4000px rgba(4,7,16,${((hlBeat.code ? 0.7 : 0.52) * e).toFixed(3)}), 0 0 ${18 + 16 * pulse}px ${c}, inset 0 0 ${10 + 8 * pulse}px ${c}55`;
+        } else {
+          hl.style.opacity = 0;
+          hl.style.boxShadow = "none";
+        }
+
+        const pill = $("pill");
+        if (pillBeat) {
+          const e = eo(env(pillBeat, 0.3, 0.3));
+          pill.style.setProperty("--c", COLORS[pillBeat.kind]);
+          $("ptext").textContent = pillBeat.label;
+          pill.style.opacity = e;
+          pill.style.transform = `translateX(-50%) translateY(${(1 - e) * 36}px) scale(${lerp(0.94, 1, e)})`;
+        } else pill.style.opacity = 0;
+
+        const code = $("code");
+        if (codeBeat) {
+          const e = eo(env(codeBeat, 0.25, 0.35));
+          const n = Math.floor(codeBeat.code.length * eo((t - (codeBeat.t + 0.2)) / 0.55));
+          code.style.setProperty("--c", COLORS[codeBeat.kind]);
+          $("ctext").textContent =
+            codeBeat.code.slice(0, n) +
+            (n < codeBeat.code.length && Math.floor(t * 8) % 2 ? "▌" : "");
+          $("cbar").style.width =
+            `${Math.round(clamp((t - (codeBeat.t + 0.2)) / 0.6, 0, 1) * 100)}%`;
+          code.style.opacity = e;
+          code.style.transform = `scale(${lerp(1.18, 1, e)})`;
+          code.style.filter = glitch > 0 ? `blur(${glitch * 3}px)` : "none";
+        } else code.style.opacity = 0;
+
+        const cnt = $("counter");
+        if (cntBeat) {
+          const e = eo(env(cntBeat, 0.3, 0.35));
+          const [a, b] = cntBeat.counter.text.split(" / ").map(Number);
+          const val = Math.round(a * eo((t - (cntBeat.t + 0.15)) / 0.9));
+          cnt.style.setProperty("--c", COLORS[cntBeat.kind]);
+          $("cnum").textContent = `${val} / ${b}`;
+          $("ccap").textContent = cntBeat.counter.caption;
+          cnt.style.opacity = e;
+          cnt.style.transform = `translateY(${(1 - e) * -30}px) scale(${lerp(0.9, 1, e)})`;
+        } else cnt.style.opacity = 0;
+
+        // glitch: RGB split + jitter + red cast on the screen layer
+        const screen = $("screen"),
+          camEl = $("cam");
+        if (glitch > 0) {
+          const j = (rnd() - 0.5) * 18 * glitch;
+          screen.style.filter = `drop-shadow(${7 * glitch}px 0 0 rgba(255,0,70,.75)) drop-shadow(${-7 * glitch}px 0 0 rgba(0,220,255,.75)) saturate(${1 + glitch})`;
+          screen.style.transform = `translate(${j}px, ${(rnd() - 0.5) * 8 * glitch}px)`;
+        } else {
+          screen.style.filter = "none";
+          screen.style.transform = "none";
+        }
+
+        // ripple rings from the focused element
+        for (const [i, id] of ["ring1", "ring2"].entries()) {
+          const el = $(id);
+          if (ripple) {
+            const u = clamp((t - ripple.t - i * 0.22) / 0.95, 0, 1);
+            const r = ripple.rect,
+              [sx, sy] = toScreen(cam, r.x + r.w / 2, r.y + r.h / 2);
+            const rad = lerp(40, 560, eo(u));
+            el.style.setProperty("--c", COLORS[ripple.kind]);
+            el.style.left = `${sx - rad}px`;
+            el.style.top = `${sy - rad}px`;
+            el.style.width = `${rad * 2}px`;
+            el.style.height = `${rad * 2}px`;
+            el.style.opacity = u > 0 && u < 1 ? 0.75 * (1 - u) : 0;
+          } else el.style.opacity = 0;
+        }
+
+        // ---- lower third, chapters ----
+        const ti = TL.titles.find((x) => t >= x.t && t < x.t + x.dur + 0.4);
+        const title = $("title");
+        if (ti) {
+          const a = eo((t - ti.t) / 0.4),
+            b = 1 - clamp((t - (ti.t + ti.dur)) / 0.35, 0, 1);
+          $("tn").textContent = String(ti.n).padStart(2, "0");
+          $("tt").textContent = ti.text;
+          title.style.opacity = a * b;
+          title.style.transform = `translateX(${(1 - a) * -60}px)`;
+          $("tl").style.width = `${Math.round(a * 100)}%`;
+        } else title.style.opacity = 0;
+        for (const el of $("chapters").children)
+          el.classList.toggle(
+            "on",
+            el.dataset.id === sc.id || (sc.id === "s5a" && el.dataset.id === "s5b"),
+          );
+        const hudOp = t < TL.intro - 0.2 || t >= TL.endCard.t ? 0 : 1;
+        for (const id of ["chapters", "wordmark", "badge"]) $(id).style.opacity = hudOp;
+
+        // ---- kinetic tagline ----
+        TL.tagline.forEach((g, i) => {
+          const el = $("kw" + i);
+          const u = eo((t - g.t) / 0.5);
+          const out = 1 - eo((t - endT) / 0.4);
+          el.style.opacity = t >= g.t ? u * out : 0;
+          el.style.transform = `scale(${lerp(1.3, 1, u)})`;
+          el.style.filter = `blur(${(1 - u) * 14}px)`;
+          el.style.color = i === 2 ? "#4ade80" : i === 1 ? "#7cb7ff" : "#eaf1ff";
+          el.style.textShadow = `0 0 ${30 * u}px currentColor`;
+        });
+
+        // ---- intro ----
+        const intro = $("intro");
+        const iu = t / TL.intro;
+        if (t < TL.intro + 0.5) {
+          const out = clamp((t - (TL.intro - 0.55)) / 0.5, 0, 1);
+          intro.style.opacity = 1 - eio(out);
+          intro.style.transform = `scale(${lerp(1, 1.35, eio(out))})`;
+          intro.style.filter = out > 0 ? `blur(${out * 18}px)` : "none";
+          $("ip1").style.strokeDasharray = "1";
+          $("ip1").style.strokeDashoffset = String(1 - eo(t / 0.9));
+          $("ip2").style.strokeDasharray = "1";
+          $("ip2").style.strokeDashoffset = String(1 - eo((t - 0.5) / 0.6));
+          [...$("introTitle").children].forEach((c, i) => {
+            const u = eo((t - 0.55 - i * 0.045) / 0.5);
+            c.style.opacity = u;
+            c.style.transform = `translateY(${(1 - u) * 50}px)`;
+          });
+          $("introSub").style.opacity = eo((t - 1.2) / 0.5);
+        } else intro.style.opacity = 0;
+
+        // ---- end card ----
+        const end = $("endcard");
+        if (t >= TL.endCard.t - 0.05) {
+          const e = eo((t - TL.endCard.t) / 0.6);
+          end.style.opacity = e;
+          end.style.transform = `scale(${lerp(0.94, 1, e)})`;
+          [...$("endTitle").children].forEach((c, i) => {
+            const u = eo((t - TL.endCard.t - 0.2 - i * 0.04) / 0.5);
+            c.style.opacity = u;
+            c.style.transform = `translateY(${(1 - u) * 36}px)`;
+          });
+          $("endTag").style.opacity = eo((t - TL.endCard.t - 0.7) / 0.5);
+          $("endSub").style.opacity = eo((t - TL.endCard.t - 1.1) / 0.5);
+        } else end.style.opacity = 0;
+
+        // ---- background life ----
+        const b1 = $("b1"),
+          b2 = $("b2"),
+          b3 = $("b3");
+        b1.style.transform = `translate(${300 + 160 * Math.sin(t * 0.21)}px, ${-200 + 120 * Math.cos(t * 0.17)}px)`;
+        b2.style.transform = `translate(${1150 + 180 * Math.cos(t * 0.15)}px, ${420 + 140 * Math.sin(t * 0.19)}px)`;
+        b3.style.transform = `translate(${760 + 220 * Math.sin(t * 0.12 + 1)}px, ${640 + 100 * Math.cos(t * 0.23)}px)`;
+        $("grid").style.transform = `translate(${(t * 9) % 72}px, ${(t * 5) % 72}px)`;
+        pctx.clearRect(0, 0, W, H);
+        for (const p of PARTS) {
+          const x = (((p.x + p.vx * t) % W) + W) % W,
+            y = (((p.y + p.vy * t) % H) + H) % H;
+          const a = 0.18 + 0.16 * Math.sin(t * 1.3 + p.ph);
+          const g = pctx.createRadialGradient(x, y, 0, x, y, p.r * 4);
+          g.addColorStop(0, `hsla(${p.hue},90%,70%,${a})`);
+          g.addColorStop(1, `hsla(${p.hue},90%,70%,0)`);
+          pctx.fillStyle = g;
+          pctx.beginPath();
+          pctx.arc(x, y, p.r * 4, 0, 6.2832);
+          pctx.fill();
+        }
+        $("grain").style.transform =
+          `translate(${(rnd() * 6 - 3) | 0}px, ${(rnd() * 6 - 3) | 0}px)`;
+        return true;
+      }
+      window.init = init;
+      window.renderFrame = renderFrame;
+    </script>
+  </body>
+</html>
